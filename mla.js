@@ -27,22 +27,36 @@ mla.authors = function(authors)
 	return "";
 }
 
+mla.editors = function(editors)
+{
+	if (typeof editors !== "object" || !Array.isArray(editors) || editors.length === 0) {return "";}
+	var str = "Edited by ";
+	str += mla.nameFormat(editors[0])
+	for (var i = 1; i < editors.length; i++)
+	{
+		str += " and " + mla.nameFormat(editors[i]);
+	}
+	return str + ", ";
+}
+
+mla.addOn = function(prefix, data, suffix)
+{
+	if (data)
+	{
+		return prefix + data + suffix;
+	}
+	return "";
+}
+
 mla.format = function(data)
 {
 	var str = `${mla.authors(data.author)}"${data.title}." `;
 	str += (data.journal || data.book || "") + ", ";
-	if (typeof data.editor === "object" && Array.isArray(data.editor))
-	{
-		str += "Edited by ";
-		for (var i = 0; i < data.editor.length; i++)
-		{
-			str += mla.nameFormat(data.editor[0]) + ", ";
-		}
-	}
-	str += data.volume ? "vol. " + data.volume + ", " : "";
-	str += data.issue ? "no. " + data.issue + ", " : "";
-	str += data.publisher ? data.publisher + ", " : "";
-	str += data.publicationYear ? getYear(data.publicationYear) + ", " : "";
+	str += mla.editors(data.editor);
+	str += mla.addOn("vol. ", data.volume, ", ");
+	str += mla.addOn("no. ", data.issue, ", ");
+	str += mla.addOn("", data.publisher, ", ");
+	str += mla.addOn("", getYear(data.publicationYear), ", ");
 	str += "pp. " + data.startPage + "-" + data.endPage + ".";
-	return str;
+	return str.replace(/\s{2,}/, " ").trim();
 }
