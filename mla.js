@@ -1,40 +1,48 @@
-function mlaAuthor(data)
+var mla = {};
+
+mla.nameFormat = function(name)
 {
-	var str = "";
-	if (typeof data.author === "object" && Array.isArray(data.author))
-	{
-		str += data.author[0];
-		if (data.author.length === 2)
-		{
-			str += ", and " + authorName(data.author[1]);
-		}
-		else if (data.author.length > 2)
-		{
-			str += ", et al";
-		}
-		str += ". ";
-	}
-	return str;
+	if (typeof name !== "string") {throw new Error("nameFormat arg not str");}
+	var name = name.split(",");
+	var last = name[0].trim();
+	var firstMiddle = name[1].trim();
+	return `${firstMiddle} ${last}`;
 }
 
-function mla(objFormat)
+mla.authors = function(authors)
 {
-	var str = "";
-	str += mlaAuthor(objFormat);
-	str += "\"" + objFormat.title + ".\" ";
-	str += (objFormat.journal || objFormat.book || "") + ", ";
-	if (typeof objFormat.editor === "object" && Array.isArray(objFormat.editor))
+	if (typeof authors !== "object" || !Array.isArray(authors) || authors.length === 0) {return "";}
+	if (authors.length === 1)
+	{
+		return `${authors[0]}. `;
+	}
+	else if (authors.length === 2)
+	{
+		return `${authors[0]}, and ${mla.nameFormat(authors[1])}. `;
+	}
+	else if (authors.length > 2)
+	{
+		return `${authors[0]}, et al. `;
+	}
+	return "";
+}
+
+mla.format = function(data)
+{
+	var str = `${mla.authors(data.author)}"${data.title}." `;
+	str += (data.journal || data.book || "") + ", ";
+	if (typeof data.editor === "object" && Array.isArray(data.editor))
 	{
 		str += "Edited by ";
-		for (var i = 0; i < objFormat.editor.length; i++)
+		for (var i = 0; i < data.editor.length; i++)
 		{
-			str += authorName(objFormat.editor[0]) + ", ";
+			str += mla.nameFormat(data.editor[0]) + ", ";
 		}
 	}
-	str += objFormat.volume ? "vol. " + objFormat.volume + ", " : "";
-	str += objFormat.issue ? "no. " + objFormat.issue + ", " : "";
-	str += objFormat.publisher ? objFormat.publisher + ", " : "";
-	str += objFormat.publicationYear ? getYear(objFormat.publicationYear) + ", " : "";
-	str += "pp. " + objFormat.startPage + "-" + objFormat.endPage + ".";
+	str += data.volume ? "vol. " + data.volume + ", " : "";
+	str += data.issue ? "no. " + data.issue + ", " : "";
+	str += data.publisher ? data.publisher + ", " : "";
+	str += data.publicationYear ? getYear(data.publicationYear) + ", " : "";
+	str += "pp. " + data.startPage + "-" + data.endPage + ".";
 	return str;
 }

@@ -22,7 +22,7 @@ function convert(fileData)
 	var str = "";
 	for (var record of records)
 	{
-		str += mla(ris(record)) + "\n";
+		str += mla.format(ris(record)) + "\n";
 	}
 	return str;
 }
@@ -126,14 +126,6 @@ function ris(dataStructure)
 		catch (err) {}
 	}
 	return obj;
-}
-
-function authorName(str)
-{
-	var name = str.split(",");
-	var lastName = name[0].trim();
-	var firstMiddle = name[1].trim();
-	return firstMiddle + " " + lastName;
 }
 
 function getYear(dateStr)
